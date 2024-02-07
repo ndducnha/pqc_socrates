@@ -48,6 +48,8 @@ pki --gen --outform pem > carolKeyRSA.pem
 
 pki --issue --cacert caCertRSA.pem --cakey caKeyRSA.pem    \
      --type priv --in carolKeyRSA.pem --lifetime 1461 \
-     --dn "C=CH, O=Cyber, CN=carol@strongswan.org1"  \
-     --san carol@strongswan.org1 --outform pem > carolCertRSA.pem
+     --dn "C=CH, O=Cyber, CN=carol@strongswan.org"  \
+     --san carol@strongswan.org --outform pem > carolCertRSA.pem
+     
+
      
