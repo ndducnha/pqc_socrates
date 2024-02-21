@@ -1,0 +1,49 @@
+# 5G Network Simulation Scenarios
+# Case 1: High-Speed Urban Area
+tc qdisc add dev eth0 root netem delay 10ms loss 0.1% rate 100mbit
+sleep 1
+time { swanctl --initiate --child net > /dev/null, swanctl --initiate --child host > /dev/null}
+sleep 2
+swanctl --terminate --child host > /dev/null
+sleep 1
+swanctl --terminate --child net > /dev/null
+sleep 2
+tc qdisc del dev eth0 root
+
+# Case 2: Medium-Speed Suburban Area
+tc qdisc add dev eth0 root netem delay 20ms loss 0.3% rate 50mbit
+# Case 3: Low-Speed Rural Area
+tc qdisc add dev eth0 root netem delay 30ms loss 0.5% rate 20mbit
+
+# High Traffic Website Simulation Scenarios
+# Case 1: Normal Traffic
+tc qdisc add dev eth0 root netem delay 50ms loss 0.1% rate 100mbit
+# Case 2: Peak Traffic During Sale
+tc qdisc add dev eth0 root netem delay 100ms loss 1% rate 50mbit
+# Case 3: Global Launch Traffic Spike
+tc qdisc add dev eth0 root netem delay 150ms loss 2% rate 30mbit
+
+# VoIP and Video Conferencing Simulation Scenarios
+# Case 1: Optimal Conditions
+tc qdisc add dev eth0 root netem delay 20ms loss 0.1% rate 10mbit
+# Case 2: Average Conditions
+tc qdisc add dev eth0 root netem delay 50ms loss 1% rate 5mbit
+# Case 3: Poor Conditions
+tc qdisc add dev eth0 root netem delay 100ms loss 2.5% rate 1mbit
+
+# Online Gaming Simulation Scenarios
+# Case 1: Local Multiplayer
+tc qdisc add dev eth0 root netem delay 30ms loss 0.2% rate 20mbit
+# Case 2: International Multiplayer
+tc qdisc add dev eth0 root netem delay 100ms loss 0.5% rate 10mbit
+# Case 3: Mobile Gaming on 4G
+tc qdisc add dev eth0 root netem delay 75ms loss 1% rate 5mbit
+
+# Cloud Services Simulation Scenarios
+# Case 1: Cloud Data Transfer - High Bandwidth
+tc qdisc add dev eth0 root netem delay 10ms loss 0.1% rate 100mbit
+# Case 2: Cloud Computing - Average Conditions
+tc qdisc add dev eth0 root netem delay 50ms loss 0.5% rate 50mbit
+# Case 3: Distributed Services - Variable Network
+tc qdisc add dev eth0 root netem delay 70ms loss 1% rate 20mbit
+
