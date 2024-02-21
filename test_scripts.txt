@@ -4,7 +4,7 @@ echo "Comprehensive Network Simulation Script"
 
 # --- 5G Network Simulation Scenarios ---
 
-echo "Simulating High-Speed Urban Area"
+echo "1.1 Simulating High-Speed Urban Area"
 tc qdisc add dev eth0 root netem delay 10ms loss 0.1% rate 100mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -15,7 +15,7 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
-echo "Simulating Medium-Speed Suburban Area"
+echo "1.2 Simulating Medium-Speed Suburban Area"
 tc qdisc add dev eth0 root netem delay 20ms loss 0.3% rate 50mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -26,7 +26,7 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
-echo "Simulating Low-Speed Rural Area"
+echo "1.3 Simulating Low-Speed Rural Area"
 tc qdisc add dev eth0 root netem delay 30ms loss 0.5% rate 20mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -39,7 +39,7 @@ tc qdisc del dev eth0 root
 
 # --- High Traffic Website Simulation Scenarios ---
 
-echo "Simulating Normal Website Traffic"
+echo "2.1 Simulating Normal Website Traffic"
 tc qdisc add dev eth0 root netem delay 50ms loss 0.1% rate 100mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -50,7 +50,7 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
-echo "Simulating Traffic During Sale"
+echo "2.2 Simulating Traffic During Sale"
 tc qdisc add dev eth0 root netem delay 100ms loss 1% rate 50mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -61,7 +61,7 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
-echo "Simulating Traffic Spike for Global Launch"
+echo "2.3 Simulating Traffic Spike for Global Launch"
 tc qdisc add dev eth0 root netem delay 150ms loss 2% rate 30mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -72,9 +72,46 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
+
+# VoIP and Video Conferencing Simulation
+echo "3.1 Optimal Conditions for VoIP/Video"
+tc qdisc add dev eth0 root netem delay 20ms loss 0.1% rate 10mbit
+sleep 1
+time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
+sleep 2
+swanctl --terminate --child host > /dev/null
+sleep 1
+swanctl --terminate --child net > /dev/null
+sleep 2
+tc qdisc del dev eth0 root
+
+echo "3.2 Average Home Internet for VoIP/Video"
+tc qdisc add dev eth0 root netem delay 50ms loss 1% rate 5mbit
+sleep 1
+time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
+sleep 2
+swanctl --terminate --child host > /dev/null
+sleep 1
+swanctl --terminate --child net > /dev/null
+sleep 2
+tc qdisc del dev eth0 root
+
+echo "3.3 Poor Conditions for VoIP/Video"
+tc qdisc add dev eth0 root netem delay 100ms loss 2.5% rate 1mbit
+sleep 1
+time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
+sleep 2
+swanctl --terminate --child host > /dev/null
+sleep 1
+swanctl --terminate --child net > /dev/null
+sleep 2
+tc qdisc del dev eth0 root
+
+
+
 # --- Online Gaming Simulation Scenarios ---
 
-echo "Simulating Local Multiplayer Gaming"
+echo "4.1 Simulating Local Multiplayer Gaming"
 tc qdisc add dev eth0 root netem delay 30ms loss 0.2% rate 20mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -85,7 +122,7 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
-echo "Simulating International Multiplayer Gaming"
+echo "4.2 Simulating International Multiplayer Gaming"
 tc qdisc add dev eth0 root netem delay 100ms loss 0.5% rate 10mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -96,7 +133,7 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
-echo "Simulating Mobile Gaming on 4G"
+echo "4.3 Simulating Mobile Gaming on 4G"
 tc qdisc add dev eth0 root netem delay 75ms loss 1% rate 5mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -109,7 +146,7 @@ tc qdisc del dev eth0 root
 
 # --- Cloud Services Simulation Scenarios ---
 
-echo "Simulating Cloud Data Transfer - High Bandwidth"
+echo "5.1 Simulating Cloud Data Transfer - High Bandwidth"
 tc qdisc add dev eth0 root netem delay 10ms loss 0.1% rate 100mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -120,7 +157,7 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
-echo "Simulating Average Cloud Computing Conditions"
+echo "5.2 Simulating Average Cloud Computing Conditions"
 tc qdisc add dev eth0 root netem delay 50ms loss 0.5% rate 50mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
@@ -131,7 +168,7 @@ swanctl --terminate --child net > /dev/null
 sleep 2
 tc qdisc del dev eth0 root
 
-echo "Simulating Cloud Gaming in Distributed Services"
+echo "5.3 Simulating Cloud Gaming in Distributed Services"
 tc qdisc add dev eth0 root netem delay 70ms loss 1% rate 20mbit
 sleep 1
 time bash -c 'swanctl --initiate --child net > /dev/null; swanctl --initiate --child host > /dev/null'
