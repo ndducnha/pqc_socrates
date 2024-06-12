@@ -60,6 +60,6 @@ if __name__ == "__main__":
             with open(OUTPUT_FILE, "w") as f:
                 f.write(f"{bandwidth:.3f}\n{latency:.3f}\n")
 
-            time.sleep(5)
+            time.sleep(2)
     finally:
         os.remove(temp_file.name)

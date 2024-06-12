@@ -37,7 +37,7 @@ establish_connection() {
     sudo tc qdisc add dev eth0 parent 1:1 handle 10: netem delay $latency_limit
 
     # Wait for network changes to take effect
-    sleep 2
+    sleep 4
 
     # Read actual values from network_status.txt
     if [ -f "/network_status.txt" ]; then
@@ -69,7 +69,7 @@ establish_connection() {
         key_type2_str="KEY_FALCON_1024"
     fi
 
-    echo "Selected Keys: $key_type1_str, $key_type2_str"
+    echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
 
     # Terminate the previous charon process if it exists
     if pgrep charon > /dev/null; then
