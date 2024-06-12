@@ -10,30 +10,49 @@ establish_connection() {
 
     case $scenario in
         1)
+            echo "*****************************************"
+            echo "* SOCRATES WP5 - Scenario 1: Low Bandwidth, High Latency *"
+            echo "*****************************************"
             bandwidth_limit="30mbit"
             latency_limit="130ms"
+            apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
             ;;
         2)
+            echo "*****************************************"
+            echo "* SOCRATES WP5 - Scenario 2: Moderate Bandwidth, Moderate Latency *"
+            echo "*****************************************"
             bandwidth_limit="50mbit"
             latency_limit="85ms"
+            apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
             ;;
         3)
+            echo "*****************************************"
+            echo "* SOCRATES WP5 - Scenario 3: High Bandwidth, Moderate Latency *"
+            echo "*****************************************"
             bandwidth_limit="85mbit"
             latency_limit="75ms"
+            apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
             ;;
         4)
+            echo "*****************************************"
+            echo "* SOCRATES WP5 - Scenario 4: Very High Bandwidth, Low Latency *"
+            echo "*****************************************"
             bandwidth_limit="150mbit"
             latency_limit="10ms"
+            apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
             ;;
         5)
+            echo "*****************************************"
+            echo "* SOCRATES WP5 - Scenario 5: Mobility with Changing Network Conditions *"
+            echo "*****************************************"
             # Start with condition A
             change_network_conditions "30mbit" "130ms"
             sleep 5
             # Change to condition B
-            change_network_conditions "150mbit" "10ms"
+            change_network_conditions1 "150mbit" "10ms"
             sleep 5
             # Change to condition C
-            change_network_conditions "85mbit" "75ms"
+            change_network_conditions1 "50mbit" "85ms"
             sleep 5
             return
             ;;
@@ -57,7 +76,45 @@ change_network_conditions() {
     tc qdisc add dev eth0 root netem rate $bandwidth_limit delay $latency_limit
 
     # Wait for network changes to take effect
-    sleep 5
+    sleep 6
+
+    # Read actual values from network_status.txt
+    if [ -f "/network_status.txt" ]; then
+        bandwidth=$(sed -n '1p' /network_status.txt)
+        latency=$(sed -n '2p' /network_status.txt)
+        echo "Current network condition: Bandwidth = $bandwidth Mbps, Latency = $latency ms"
+    else
+        echo "network_status.txt not found"
+        exit 1
+    fi
+
+    # Ensure bandwidth and latency are not empty
+    bandwidth=${bandwidth:-0}
+    latency=${latency:-0}
+
+    # Convert bandwidth and latency to integers for comparison
+    bandwidth_int=$(printf "%.0f" "$bandwidth")
+    latency_int=$(printf "%.0f" "$latency")
+
+
+    # Determine key combinations based on network conditions
+    determine_key_combinations "$bandwidth_int" "$latency_int"
+
+    echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
+}
+
+change_network_conditions1() {
+    local bandwidth_limit=$1
+    local latency_limit=$2
+
+    # Remove existing tc qdisc settings
+    tc qdisc del dev eth0 root 2>/dev/null
+
+    # Apply the new network conditions using tc
+    tc qdisc add dev eth0 root netem rate $bandwidth_limit delay $latency_limit
+
+    # Wait for network changes to take effect
+    sleep 6
 
     # Read actual values from network_status.txt
     if [ -f "/network_status.txt" ]; then
