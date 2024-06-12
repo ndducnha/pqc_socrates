@@ -40,7 +40,7 @@ establish_connection() {
     tc qdisc add dev eth0 parent 1:1 handle 10: netem delay $latency_limit
 
     # Wait for network changes to take effect
-    sleep 2
+    sleep 5
 
     # Read actual values from network_status.txt
     if [ -f "/network_status.txt" ]; then
@@ -51,10 +51,15 @@ establish_connection() {
         exit 1
     fi
 
-    # Determine key combinations based on network conditions
-    bandwidth_int=${bandwidth%.*}  # Convert bandwidth to integer
-    latency_int=${latency%.*}  # Convert latency to integer
+    # Ensure bandwidth and latency are not empty
+    bandwidth=${bandwidth:-0}
+    latency=${latency:-0}
 
+    # Convert bandwidth and latency to integers for comparison
+    bandwidth_int=$(printf "%.0f" "$bandwidth")
+    latency_int=$(printf "%.0f" "$latency")
+
+    # Determine key combinations based on network conditions
     if [ "$bandwidth_int" -lt 50 ] && [ "$latency_int" -gt 100 ]; then
         key_type1_str="KEY_ED25519"
         key_type2_str="KEY_FALCON_512"
