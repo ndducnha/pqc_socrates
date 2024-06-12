@@ -30,7 +30,7 @@ establish_connection() {
             change_network_conditions "30mbit" "130ms"
             sleep 5
             # Change to condition B
-            change_network_conditions "50mbit" "85ms"
+            change_network_conditions "150mbit" "10ms"
             sleep 5
             # Change to condition C
             change_network_conditions "85mbit" "75ms"
@@ -144,7 +144,7 @@ apply_network_conditions_and_establish_connection() {
     # Determine key combinations based on network conditions
     determine_key_combinations "$bandwidth_int" "$latency_int"
 
-    echo "Selected Keys: $key_type1_str, $key_type2_str"
+    echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
 
     # Terminate the previous charon process if it exists
     if pgrep charon > /dev/null; then
