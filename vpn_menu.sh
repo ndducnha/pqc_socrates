@@ -55,9 +55,15 @@ establish_connection() {
     elif (( $(echo "$bandwidth < 75" | bc -l) )) && (( $(echo "$latency > 75" | bc -l) )); then
         key_type1_str="KEY_ECDSA_256"
         key_type2_str="KEY_DILITHIUM_2"
-    elif (( $(echo "$bandwidth < 100" | bc -l) )) && (( $(echo "$latency < 100" | bc -l) )); then
+    elif (( $(echo "$bandwidth >= 50 && $bandwidth <= 75" | bc -l) )) && (( $(echo "$latency >= 75 && $latency <= 100" | bc -l) )); then
+        key_type1_str="KEY_ED25519"
+        key_type2_str="KEY_DILITHIUM_2"
+    elif (( $(echo "$bandwidth >= 75 && $bandwidth <= 100" | bc -l) )) && (( $(echo "$latency >= 50 && $latency <= 100" | bc -l) )); then
         key_type1_str="KEY_ED25519"
         key_type2_str="KEY_DILITHIUM_3"
+    elif (( $(echo "$bandwidth > 100" | bc -l) )) && (( $(echo "$latency < 50" | bc -l) )); then
+        key_type1_str="KEY_RSA_2048"
+        key_type2_str="KEY_FALCON_1024"
     else
         key_type1_str="KEY_RSA_2048"
         key_type2_str="KEY_FALCON_1024"
