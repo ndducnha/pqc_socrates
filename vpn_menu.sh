@@ -31,7 +31,10 @@ establish_connection() {
             ;;
     esac
 
-    # Apply the network conditions using tc
+    # Remove existing tc qdisc settings
+    tc qdisc del dev eth0 root 2>/dev/null
+
+    # Apply the new network conditions using tc
     tc qdisc add dev eth0 root handle 1: htb default 30
     tc class add dev eth0 parent 1: classid 1:1 htb rate $bandwidth_limit
     tc qdisc add dev eth0 parent 1:1 handle 10: netem delay $latency_limit
@@ -79,8 +82,8 @@ establish_connection() {
         pkill charon
     fi
 
-    # Start charon in the background and establish the VPN connection
-    ./charon &
+    # Start charon in the background and redirect output to /dev/null
+    ./charon > /dev/null 2>&1 &
     sleep 2  # Give charon some time to start
     swanctl --initiate --child net > /dev/null
     swanctl --initiate --child host > /dev/null
