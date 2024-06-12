@@ -1,8 +1,10 @@
 import socket
 import time
+import subprocess
 
 BUFFER_SIZE = 1024
 PORT = 12345
+OUTPUT_FILE = "network_status.txt"
 
 def measure_bandwidth_server(client_socket):
     total_bytes = 0
@@ -20,6 +22,14 @@ def measure_bandwidth_server(client_socket):
 
     return bandwidth_mbps
 
+def measure_latency(server_ip):
+    result = subprocess.run(['ping', '-c', '10', server_ip], stdout=subprocess.PIPE, text=True)
+    for line in result.stdout.split('\n'):
+        if 'rtt min/avg/max/mdev' in line:
+            latency = line.split('/')[4]
+            return float(latency)
+    return None
+
 def start_bandwidth_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(('', PORT))
@@ -27,8 +37,18 @@ def start_bandwidth_server():
 
     while True:
         client_socket, addr = server_socket.accept()
-        measure_bandwidth_server(client_socket)
+        bandwidth = measure_bandwidth_server(client_socket)
         client_socket.close()
+        
+        latency = measure_latency(addr[0])
+        if latency is None:
+            latency = -1
+
+        print(f"Parsed bandwidth: {bandwidth:.3f} Mbps")
+        print(f"Parsed latency: {latency:.3f} ms")
+
+        with open(OUTPUT_FILE, "w") as f:
+            f.write(f"{bandwidth:.3f}\n{latency:.3f}\n")
 
     server_socket.close()
 
