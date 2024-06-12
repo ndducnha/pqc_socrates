@@ -58,6 +58,7 @@ establish_connection() {
             ;;
     esac
 
+    # Apply the network conditions and establish connection
     apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
 }
 
@@ -186,7 +187,10 @@ while true; do
     read -p "Choose: " choice
 
     case $choice in
-        1|2|3|4|5)
+        1|2|3|4)
+            establish_connection $choice
+            ;;
+        5)
             establish_connection $choice
             ;;
         6)
