@@ -32,12 +32,12 @@ establish_connection() {
     esac
 
     # Apply the network conditions using tc
-    sudo tc qdisc add dev eth0 root handle 1: htb default 30
-    sudo tc class add dev eth0 parent 1: classid 1:1 htb rate $bandwidth_limit
-    sudo tc qdisc add dev eth0 parent 1:1 handle 10: netem delay $latency_limit
+    tc qdisc add dev eth0 root handle 1: htb default 30
+    tc class add dev eth0 parent 1: classid 1:1 htb rate $bandwidth_limit
+    tc qdisc add dev eth0 parent 1:1 handle 10: netem delay $latency_limit
 
     # Wait for network changes to take effect
-    sleep 4
+    sleep 2
 
     # Read actual values from network_status.txt
     if [ -f "/network_status.txt" ]; then
@@ -49,19 +49,22 @@ establish_connection() {
     fi
 
     # Determine key combinations based on network conditions
-    if (( $(echo "$bandwidth < 50" | bc -l) )) && (( $(echo "$latency > 100" | bc -l) )); then
+    bandwidth_int=${bandwidth%.*}  # Convert bandwidth to integer
+    latency_int=${latency%.*}  # Convert latency to integer
+
+    if [ "$bandwidth_int" -lt 50 ] && [ "$latency_int" -gt 100 ]; then
         key_type1_str="KEY_ED25519"
         key_type2_str="KEY_FALCON_512"
-    elif (( $(echo "$bandwidth < 75" | bc -l) )) && (( $(echo "$latency > 75" | bc -l) )); then
+    elif [ "$bandwidth_int" -lt 75 ] && [ "$latency_int" -gt 75 ]; then
         key_type1_str="KEY_ECDSA_256"
         key_type2_str="KEY_DILITHIUM_2"
-    elif (( $(echo "$bandwidth >= 50 && $bandwidth <= 75" | bc -l) )) && (( $(echo "$latency >= 75 && $latency <= 100" | bc -l) )); then
+    elif [ "$bandwidth_int" -ge 50 ] && [ "$bandwidth_int" -le 75 ] && [ "$latency_int" -ge 75 ] && [ "$latency_int" -le 100 ]; then
         key_type1_str="KEY_ED25519"
         key_type2_str="KEY_DILITHIUM_2"
-    elif (( $(echo "$bandwidth >= 75 && $bandwidth <= 100" | bc -l) )) && (( $(echo "$latency >= 50 && $latency <= 100" | bc -l) )); then
+    elif [ "$bandwidth_int" -ge 75 ] && [ "$bandwidth_int" -le 100 ] && [ "$latency_int" -ge 50 ] && [ "$latency_int" -le 100 ]; then
         key_type1_str="KEY_ED25519"
         key_type2_str="KEY_DILITHIUM_3"
-    elif (( $(echo "$bandwidth > 100" | bc -l) )) && (( $(echo "$latency < 50" | bc -l) )); then
+    elif [ "$bandwidth_int" -gt 100 ] && [ "$latency_int" -lt 50 ]; then
         key_type1_str="KEY_RSA_2048"
         key_type2_str="KEY_FALCON_1024"
     else
@@ -69,18 +72,18 @@ establish_connection() {
         key_type2_str="KEY_FALCON_1024"
     fi
 
-    echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
+    echo "Selected Keys: $key_type1_str, $key_type2_str"
 
     # Terminate the previous charon process if it exists
     if pgrep charon > /dev/null; then
-        sudo pkill charon
+        pkill charon
     fi
 
     # Start charon in the background and establish the VPN connection
-    sudo ./charon &
+    ./charon &
     sleep 2  # Give charon some time to start
-    sudo swanctl --initiate --child net > /dev/null
-    sudo swanctl --initiate --child host > /dev/null
+    swanctl --initiate --child net > /dev/null
+    swanctl --initiate --child host > /dev/null
 
     echo "VPN connection established for scenario $scenario"
 }
