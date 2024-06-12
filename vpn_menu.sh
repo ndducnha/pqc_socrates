@@ -42,7 +42,9 @@ establish_connection() {
 
     # Read actual values from network_status.txt
     if [ -f "/network_status.txt" ]; then
-        read -r bandwidth latency < /network_status.txt
+        bandwidth=$(sed -n '1p' /network_status.txt)
+        latency=$(sed -n '2p' /network_status.txt)
+        echo "Debug: Raw values from file - Bandwidth: $bandwidth, Latency: $latency"
         echo "Current network condition: Bandwidth = $bandwidth Mbps, Latency = $latency ms"
     else
         echo "network_status.txt not found"
@@ -56,6 +58,8 @@ establish_connection() {
     # Convert bandwidth and latency to integers for comparison
     bandwidth_int=$(printf "%.0f" "$bandwidth")
     latency_int=$(printf "%.0f" "$latency")
+
+    echo "Debug: Parsed values - Bandwidth: $bandwidth_int, Latency: $latency_int"
 
     # Determine key combinations based on network conditions
     if [ "$bandwidth_int" -lt 50 ] && [ "$latency_int" -gt 100 ]; then
