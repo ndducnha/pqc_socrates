@@ -15,7 +15,6 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="30mbit"
             latency_limit="130ms"
-            apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
             ;;
         2)
             echo "*****************************************"
@@ -23,7 +22,6 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="50mbit"
             latency_limit="85ms"
-            apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
             ;;
         3)
             echo "*****************************************"
@@ -31,7 +29,6 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="85mbit"
             latency_limit="75ms"
-            apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
             ;;
         4)
             echo "*****************************************"
@@ -39,7 +36,6 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="150mbit"
             latency_limit="10ms"
-            apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
             ;;
         5)
             echo "*****************************************"
@@ -49,10 +45,10 @@ establish_connection() {
             change_network_conditions "30mbit" "130ms"
             sleep 5
             # Change to condition B
-            change_network_conditions1 "150mbit" "10ms"
+            change_network_conditions "50mbit" "85ms"
             sleep 5
             # Change to condition C
-            change_network_conditions1 "50mbit" "85ms"
+            change_network_conditions "85mbit" "75ms"
             sleep 5
             return
             ;;
@@ -62,7 +58,7 @@ establish_connection() {
             ;;
     esac
 
-    apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit"
+    apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
 }
 
 change_network_conditions() {
@@ -95,45 +91,6 @@ change_network_conditions() {
     # Convert bandwidth and latency to integers for comparison
     bandwidth_int=$(printf "%.0f" "$bandwidth")
     latency_int=$(printf "%.0f" "$latency")
-
-
-    # Determine key combinations based on network conditions
-    determine_key_combinations "$bandwidth_int" "$latency_int"
-
-    echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
-}
-
-change_network_conditions1() {
-    local bandwidth_limit=$1
-    local latency_limit=$2
-
-    # Remove existing tc qdisc settings
-    tc qdisc del dev eth0 root 2>/dev/null
-
-    # Apply the new network conditions using tc
-    tc qdisc add dev eth0 root netem rate $bandwidth_limit delay $latency_limit
-
-    # Wait for network changes to take effect
-    sleep 6
-
-    # Read actual values from network_status.txt
-    if [ -f "/network_status.txt" ]; then
-        bandwidth=$(sed -n '1p' /network_status.txt)
-        latency=$(sed -n '2p' /network_status.txt)
-        echo "Current network condition: Bandwidth = $bandwidth Mbps, Latency = $latency ms"
-    else
-        echo "network_status.txt not found"
-        exit 1
-    fi
-
-    # Ensure bandwidth and latency are not empty
-    bandwidth=${bandwidth:-0}
-    latency=${latency:-0}
-
-    # Convert bandwidth and latency to integers for comparison
-    bandwidth_int=$(printf "%.0f" "$bandwidth")
-    latency_int=$(printf "%.0f" "$latency")
-
 
     # Determine key combinations based on network conditions
     determine_key_combinations "$bandwidth_int" "$latency_int"
@@ -170,6 +127,7 @@ determine_key_combinations() {
 apply_network_conditions_and_establish_connection() {
     local bandwidth_limit=$1
     local latency_limit=$2
+    local scenario=$3
 
     # Remove existing tc qdisc settings
     tc qdisc del dev eth0 root 2>/dev/null
@@ -219,11 +177,11 @@ apply_network_conditions_and_establish_connection() {
 
 while true; do
     echo "Choose an option:"
-    echo "1. Establish connection from VPN client to VPN server. (scenario 1)"
-    echo "2. Establish connection from VPN client to VPN server. (scenario 2)"
-    echo "3. Establish connection from VPN client to VPN server. (scenario 3)"
-    echo "4. Establish connection from VPN client to VPN server. (scenario 4)"
-    echo "5. Establish connection from VPN client to VPN server with mobility. (scenario 5)"
+    echo "1. Establish connection from VPN client to VPN server. (Scenario 1)"
+    echo "2. Establish connection from VPN client to VPN server. (Scenario 2)"
+    echo "3. Establish connection from VPN client to VPN server. (Scenario 3)"
+    echo "4. Establish connection from VPN client to VPN server. (Scenario 4)"
+    echo "5. Establish connection from VPN client to VPN server with mobility. (Scenario 5)"
     echo "6. End"
     read -p "Choose: " choice
 
