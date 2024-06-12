@@ -10,19 +10,19 @@ establish_connection() {
 
     case $scenario in
         1)
-            bandwidth_limit="10mbit"
-            latency_limit="150ms"
+            bandwidth_limit="30mbit"
+            latency_limit="130ms"
             ;;
         2)
-            bandwidth_limit="70mbit"
-            latency_limit="100ms"
+            bandwidth_limit="50mbit"
+            latency_limit="85ms"
             ;;
         3)
-            bandwidth_limit="90mbit"
-            latency_limit="50ms"
+            bandwidth_limit="85mbit"
+            latency_limit="75ms"
             ;;
         4)
-            bandwidth_limit="200mbit"
+            bandwidth_limit="150mbit"
             latency_limit="10ms"
             ;;
         *)
@@ -35,12 +35,10 @@ establish_connection() {
     tc qdisc del dev eth0 root 2>/dev/null
 
     # Apply the new network conditions using tc
-    tc qdisc add dev eth0 root handle 1: htb default 30
-    tc class add dev eth0 parent 1: classid 1:1 htb rate $bandwidth_limit
-    tc qdisc add dev eth0 parent 1:1 handle 10: netem delay $latency_limit
+    tc qdisc add dev eth0 root netem rate $bandwidth_limit delay $latency_limit
 
     # Wait for network changes to take effect
-    sleep 5
+    sleep 2
 
     # Read actual values from network_status.txt
     if [ -f "/network_status.txt" ]; then
