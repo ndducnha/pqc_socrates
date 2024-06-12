@@ -43,13 +43,13 @@ establish_connection() {
             echo "*****************************************"
             # Start with condition A
             change_network_conditions "30mbit" "130ms"
-            sleep 5
+            sleep 3
             # Change to condition B
-            change_network_conditions "50mbit" "85ms"
-            sleep 5
+            change_network_conditions "150mbit" "10ms"
+            sleep 3
             # Change to condition C
             change_network_conditions "85mbit" "75ms"
-            sleep 5
+            sleep 3
             return
             ;;
         *)
@@ -73,7 +73,7 @@ change_network_conditions() {
     tc qdisc add dev eth0 root netem rate $bandwidth_limit delay $latency_limit
 
     # Wait for network changes to take effect
-    sleep 6
+    sleep 10
 
     # Read actual values from network_status.txt
     if [ -f "/network_status.txt" ]; then
