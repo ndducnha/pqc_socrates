@@ -11,31 +11,31 @@ establish_connection() {
     case $scenario in
         1)
             echo "*****************************************"
-            echo "* SOCRATES WP5 - Level 1 *"
+            echo "* SOCRATES WP5 - Testing Security Level 1 *"
             echo "*****************************************"
             bandwidth_limit="30mbit"
             latency_limit="130ms"
             echo "Establishing connection with Level 1 conditions..."
             ;;
-        3)
+        2)
             echo "*****************************************"
-            echo "* SOCRATES WP5 - Level 3 *"
+            echo "* SOCRATES WP5 - Testing Security Level 3 *"
             echo "*****************************************"
             bandwidth_limit="85mbit"
             latency_limit="75ms"
             echo "Establishing connection with Level 3 conditions..."
             ;;
-        5)
+        3)
             echo "*****************************************"
-            echo "* SOCRATES WP5 - Level 5 *"
+            echo "* SOCRATES WP5 - Testing Security Level 5 *"
             echo "*****************************************"
             bandwidth_limit="180mbit"
             latency_limit="10ms"
             echo "Establishing connection with Level 5 conditions..."
             ;;
-        6)
+        4)
             echo "*****************************************"
-            echo "* SOCRATES WP5 - Mobility *"
+            echo "* SOCRATES WP5 - Testing Mobility *"
             echo "*****************************************"
             echo "Starting with first conditions..."
             change_network_conditions "30mbit" "130ms"
@@ -165,16 +165,16 @@ apply_network_conditions_and_establish_connection() {
     swanctl --initiate --child net > /dev/null
     swanctl --initiate --child host > /dev/null
 
-    echo "VPN connection established for scenario $scenario"
-    echo "******** SOCRATES WP5 - Quantum Safe Hydrid VPN - Testing ******** "
+    echo "VPN connection established successfully"
 }
 
 while true; do
+    echo "******** SOCRATES WP5 - Quantum Safe Hydrid VPN - Testing ******** "
     echo "Choose an option:"
     echo "1. Establish connection from VPN client to VPN server. (Security Level 1)"
     echo "2. Establish connection from VPN client to VPN server. (Security Level 3)"
     echo "3. Establish connection from VPN client to VPN server. (Security Level 5)"
-    echo "4. Establish connection from VPN client to VPN server with mobility. (Mobility between Levels 1, 3, and 5)"
+    echo "4. Establish connection from VPN client to VPN server with mobility."
     echo "5. End"
     read -p "Choose: " choice
 
