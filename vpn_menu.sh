@@ -15,6 +15,7 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="30mbit"
             latency_limit="130ms"
+            level="1"
             echo "Establishing connection:"
             ;;
         2)
@@ -23,6 +24,7 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="85mbit"
             latency_limit="75ms"
+            level="3"
             echo "Establishing connection:"
             ;;
         3)
@@ -31,6 +33,7 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="180mbit"
             latency_limit="10ms"
+            level="1"
             echo "Establishing connection:"
             ;;
         4)
@@ -55,7 +58,7 @@ establish_connection() {
             ;;
     esac
 
-    apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario $level
+    apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario "$level"
 }
 
 change_network_conditions() {
