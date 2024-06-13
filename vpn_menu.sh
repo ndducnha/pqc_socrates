@@ -38,13 +38,13 @@ establish_connection() {
             echo "* SOCRATES WP5 - Testing Mobility *"
             echo "*****************************************"
             echo "Starting with first conditions..."
-            change_network_conditions "30mbit" "130ms"
+            change_network_conditions "30mbit" "130ms" 1
             sleep 5
             # echo "Changing to Level 3 conditions..."
-            change_network_conditions1 "85mbit" "75ms"
+            change_network_conditions1 "85mbit" "75ms" 3
             sleep 5
             # echo "Changing to Level 5 conditions..."
-            change_network_conditions1 "180mbit" "10ms"
+            change_network_conditions1 "180mbit" "10ms" 5
             sleep 5
             echo "Mobility test completed."
             return
@@ -55,7 +55,7 @@ establish_connection() {
             ;;
     esac
 
-    apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
+    apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario $level
 }
 
 change_network_conditions() {
