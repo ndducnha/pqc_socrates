@@ -7,6 +7,7 @@ establish_connection() {
     local latency_limit
     local key_type1_str
     local key_type2_str
+    local level
 
     case $scenario in
         1)
@@ -58,7 +59,7 @@ establish_connection() {
             ;;
     esac
 
-    apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario "$level"
+    apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" "$level"
 }
 
 change_network_conditions() {
@@ -168,8 +169,7 @@ determine_key_combinations() {
 apply_network_conditions_and_establish_connection() {
     local bandwidth_limit=$1
     local latency_limit=$2
-    local scenario=$3
-    local level=$4
+    local level=$3
 
     # Remove existing tc qdisc settings
     tc qdisc del dev eth0 root 2>/dev/null
@@ -200,7 +200,7 @@ apply_network_conditions_and_establish_connection() {
     latency_int=$(printf "%.0f" "$latency")
 
     # Determine key combinations based on network conditions
-    determine_key_combinations "$bandwidth_int" "$latency_int"
+    determine_key_combinations "$bandwidth_int" "$latency_int" "$level"
     echo "The network condition is suitable for Security Level $level"
     echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
 
