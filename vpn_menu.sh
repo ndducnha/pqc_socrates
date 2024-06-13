@@ -61,6 +61,7 @@ establish_connection() {
 change_network_conditions() {
     local bandwidth_limit=$1
     local latency_limit=$2
+    local level=$3
 
     # Remove existing tc qdisc settings
     tc qdisc del dev eth0 root 2>/dev/null
@@ -92,13 +93,14 @@ change_network_conditions() {
 
     # Determine key combinations based on network conditions
     determine_key_combinations "$bandwidth_int" "$latency_int"
-
+    echo "The network condition is suitable for Security Level $level"
     echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
 }
 
 change_network_conditions1() {
     local bandwidth_limit=$1
     local latency_limit=$2
+    local level=$3
 
     # Remove existing tc qdisc settings
     tc qdisc del dev eth0 root 2>/dev/null
@@ -129,28 +131,34 @@ change_network_conditions1() {
     latency_int=$(printf "%.0f" "$latency")
 
     # Determine key combinations based on network conditions
-    determine_key_combinations "$bandwidth_int" "$latency_int"
+    determine_key_combinations "$bandwidth_int" "$latency_int" $level
 
     echo "The current network condition has changed, the security level should change, reselected the keys"
+    echo "The network condition is suitable for Security Level $level"
     echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
 }
 
 determine_key_combinations() {
     local bandwidth_int=$1
     local latency_int=$2
+    local level=$3
 
     if [ "$bandwidth_int" -lt 50 ] && [ "$latency_int" -gt 100 ]; then
         key_type1_str="KEY_ED25519"
         key_type2_str="KEY_FALCON_512"
+        level=1
     elif [ "$bandwidth_int" -ge 50 ] && [ "$bandwidth_int" -le 150 ] && [ "$latency_int" -ge 50 ] && [ "$latency_int" -le 100 ]; then
         key_type1_str="KEY_RSA_2048"
         key_type2_str="KEY_DILITHIUM_3"
+        level=3
     elif [ "$bandwidth_int" -gt 150 ] && [ "$latency_int" -lt 50 ]; then
         key_type1_str="KEY_ECDSA_256"
         key_type2_str="KEY_FALCON_1024"
+        level=5
     else
         key_type1_str="KEY_RSA_2048"
         key_type2_str="KEY_FALCON_512"
+        level=1
     fi
 }
 
@@ -158,6 +166,7 @@ apply_network_conditions_and_establish_connection() {
     local bandwidth_limit=$1
     local latency_limit=$2
     local scenario=$3
+    local level=$4
 
     # Remove existing tc qdisc settings
     tc qdisc del dev eth0 root 2>/dev/null
@@ -189,7 +198,7 @@ apply_network_conditions_and_establish_connection() {
 
     # Determine key combinations based on network conditions
     determine_key_combinations "$bandwidth_int" "$latency_int"
-
+    echo "The network condition is suitable for Security Level $level"
     echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
 
     # Terminate the previous charon process if it exists
