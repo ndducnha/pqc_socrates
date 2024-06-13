@@ -15,7 +15,7 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="30mbit"
             latency_limit="130ms"
-            echo "Establishing connection with Level 1 conditions..."
+            echo "Establishing connection:"
             ;;
         2)
             echo "*****************************************"
@@ -23,7 +23,7 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="85mbit"
             latency_limit="75ms"
-            echo "Establishing connection with Level 3 conditions..."
+            echo "Establishing connection:"
             ;;
         3)
             echo "*****************************************"
@@ -31,7 +31,7 @@ establish_connection() {
             echo "*****************************************"
             bandwidth_limit="180mbit"
             latency_limit="10ms"
-            echo "Establishing connection with Level 5 conditions..."
+            echo "Establishing connection:"
             ;;
         4)
             echo "*****************************************"
@@ -41,10 +41,10 @@ establish_connection() {
             change_network_conditions "30mbit" "130ms"
             sleep 5
             # echo "Changing to Level 3 conditions..."
-            change_network_conditions "85mbit" "75ms"
+            change_network_conditions1 "85mbit" "75ms"
             sleep 5
             # echo "Changing to Level 5 conditions..."
-            change_network_conditions "180mbit" "10ms"
+            change_network_conditions1 "180mbit" "10ms"
             sleep 5
             echo "Mobility test completed."
             return
@@ -59,6 +59,44 @@ establish_connection() {
 }
 
 change_network_conditions() {
+    local bandwidth_limit=$1
+    local latency_limit=$2
+
+    # Remove existing tc qdisc settings
+    tc qdisc del dev eth0 root 2>/dev/null
+
+    # Apply the new network conditions using tc
+    tc qdisc add dev eth0 root netem rate $bandwidth_limit delay $latency_limit
+
+    # Wait for network changes to take effect
+    sleep 6
+
+    # Read actual values from network_status.txt
+    if [ -f "/network_status.txt" ]; then
+        bandwidth=$(sed -n '1p' /network_status.txt)
+        latency=$(sed -n '2p' /network_status.txt)
+        echo "Checking current network conditions..."
+        echo "Current network condition: Bandwidth = $bandwidth Mbps, Latency = $latency ms"
+    else
+        echo "network_status.txt not found"
+        exit 1
+    fi
+
+    # Ensure bandwidth and latency are not empty
+    bandwidth=${bandwidth:-0}
+    latency=${latency:-0}
+
+    # Convert bandwidth and latency to integers for comparison
+    bandwidth_int=$(printf "%.0f" "$bandwidth")
+    latency_int=$(printf "%.0f" "$latency")
+
+    # Determine key combinations based on network conditions
+    determine_key_combinations "$bandwidth_int" "$latency_int"
+
+    echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
+}
+
+change_network_conditions1() {
     local bandwidth_limit=$1
     local latency_limit=$2
 
@@ -165,7 +203,7 @@ apply_network_conditions_and_establish_connection() {
     swanctl --initiate --child net > /dev/null
     swanctl --initiate --child host > /dev/null
 
-    echo "VPN connection established successfully"
+    echo "VPN connection established successfully."
 }
 
 while true; do
