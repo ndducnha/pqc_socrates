@@ -11,45 +11,42 @@ establish_connection() {
     case $scenario in
         1)
             echo "*****************************************"
-            echo "* SOCRATES WP5 - Scenario 1: Low Bandwidth, High Latency *"
+            echo "* SOCRATES WP5 - Level 1 *"
             echo "*****************************************"
             bandwidth_limit="30mbit"
             latency_limit="130ms"
-            ;;
-        2)
-            echo "*****************************************"
-            echo "* SOCRATES WP5 - Scenario 2: Moderate Bandwidth, Moderate Latency *"
-            echo "*****************************************"
-            bandwidth_limit="50mbit"
-            latency_limit="85ms"
+            echo "Establishing connection with Level 1 conditions..."
             ;;
         3)
             echo "*****************************************"
-            echo "* SOCRATES WP5 - Scenario 3: High Bandwidth, Moderate Latency *"
+            echo "* SOCRATES WP5 - Level 3 *"
             echo "*****************************************"
             bandwidth_limit="85mbit"
             latency_limit="75ms"
-            ;;
-        4)
-            echo "*****************************************"
-            echo "* SOCRATES WP5 - Scenario 4: Very High Bandwidth, Low Latency *"
-            echo "*****************************************"
-            bandwidth_limit="150mbit"
-            latency_limit="10ms"
+            echo "Establishing connection with Level 3 conditions..."
             ;;
         5)
             echo "*****************************************"
-            echo "* SOCRATES WP5 - Scenario 5: Mobility with Changing Network Conditions *"
+            echo "* SOCRATES WP5 - Level 5 *"
             echo "*****************************************"
-            # Start with condition A
+            bandwidth_limit="180mbit"
+            latency_limit="10ms"
+            echo "Establishing connection with Level 5 conditions..."
+            ;;
+        6)
+            echo "*****************************************"
+            echo "* SOCRATES WP5 - Mobility *"
+            echo "*****************************************"
+            echo "Starting with first conditions..."
             change_network_conditions "30mbit" "130ms"
-            sleep 3
-            # Change to condition B
-            change_network_conditions "150mbit" "10ms"
-            sleep 3
-            # Change to condition C
+            sleep 5
+            # echo "Changing to Level 3 conditions..."
             change_network_conditions "85mbit" "75ms"
-            sleep 3
+            sleep 5
+            # echo "Changing to Level 5 conditions..."
+            change_network_conditions "180mbit" "10ms"
+            sleep 5
+            echo "Mobility test completed."
             return
             ;;
         *)
@@ -58,7 +55,6 @@ establish_connection() {
             ;;
     esac
 
-    # Apply the network conditions and establish connection
     apply_network_conditions_and_establish_connection "$bandwidth_limit" "$latency_limit" $scenario
 }
 
@@ -73,12 +69,13 @@ change_network_conditions() {
     tc qdisc add dev eth0 root netem rate $bandwidth_limit delay $latency_limit
 
     # Wait for network changes to take effect
-    sleep 10
+    sleep 6
 
     # Read actual values from network_status.txt
     if [ -f "/network_status.txt" ]; then
         bandwidth=$(sed -n '1p' /network_status.txt)
         latency=$(sed -n '2p' /network_status.txt)
+        echo "Checking current network conditions..."
         echo "Current network condition: Bandwidth = $bandwidth Mbps, Latency = $latency ms"
     else
         echo "network_status.txt not found"
@@ -107,21 +104,15 @@ determine_key_combinations() {
     if [ "$bandwidth_int" -lt 50 ] && [ "$latency_int" -gt 100 ]; then
         key_type1_str="KEY_ED25519"
         key_type2_str="KEY_FALCON_512"
-    elif [ "$bandwidth_int" -lt 75 ] && [ "$latency_int" -gt 75 ]; then
-        key_type1_str="KEY_ECDSA_256"
-        key_type2_str="KEY_DILITHIUM_2"
-    elif [ "$bandwidth_int" -ge 50 ] && [ "$bandwidth_int" -le 75 ] && [ "$latency_int" -ge 75 ] && [ "$latency_int" -le 100 ]; then
-        key_type1_str="KEY_ED25519"
-        key_type2_str="KEY_DILITHIUM_2"
-    elif [ "$bandwidth_int" -ge 75 ] && [ "$bandwidth_int" -le 100 ] && [ "$latency_int" -ge 50 ] && [ "$latency_int" -le 100 ]; then
-        key_type1_str="KEY_ED25519"
-        key_type2_str="KEY_DILITHIUM_3"
-    elif [ "$bandwidth_int" -gt 100 ] && [ "$latency_int" -lt 50 ]; then
+    elif [ "$bandwidth_int" -ge 50 ] && [ "$bandwidth_int" -le 150 ] && [ "$latency_int" -ge 50 ] && [ "$latency_int" -le 100 ]; then
         key_type1_str="KEY_RSA_2048"
+        key_type2_str="KEY_DILITHIUM_3"
+    elif [ "$bandwidth_int" -gt 150 ] && [ "$latency_int" -lt 50 ]; then
+        key_type1_str="KEY_ECDSA_256"
         key_type2_str="KEY_FALCON_1024"
     else
         key_type1_str="KEY_RSA_2048"
-        key_type2_str="KEY_FALCON_1024"
+        key_type2_str="KEY_FALCON_512"
     fi
 }
 
@@ -143,6 +134,7 @@ apply_network_conditions_and_establish_connection() {
     if [ -f "/network_status.txt" ]; then
         bandwidth=$(sed -n '1p' /network_status.txt)
         latency=$(sed -n '2p' /network_status.txt)
+        echo "Checking current network conditions..."
         echo "Current network condition: Bandwidth = $bandwidth Mbps, Latency = $latency ms"
     else
         echo "network_status.txt not found"
@@ -174,16 +166,16 @@ apply_network_conditions_and_establish_connection() {
     swanctl --initiate --child host > /dev/null
 
     echo "VPN connection established for scenario $scenario"
+    echo "******** SOCRATES WP5 - Quantum Safe Hydrid VPN - Testing ******** "
 }
 
 while true; do
     echo "Choose an option:"
-    echo "1. Establish connection from VPN client to VPN server. (Scenario 1)"
-    echo "2. Establish connection from VPN client to VPN server. (Scenario 2)"
-    echo "3. Establish connection from VPN client to VPN server. (Scenario 3)"
-    echo "4. Establish connection from VPN client to VPN server. (Scenario 4)"
-    echo "5. Establish connection from VPN client to VPN server with mobility. (Scenario 5)"
-    echo "6. End"
+    echo "1. Establish connection from VPN client to VPN server. (Security Level 1)"
+    echo "2. Establish connection from VPN client to VPN server. (Security Level 3)"
+    echo "3. Establish connection from VPN client to VPN server. (Security Level 5)"
+    echo "4. Establish connection from VPN client to VPN server with mobility. (Mobility between Levels 1, 3, and 5)"
+    echo "5. End"
     read -p "Choose: " choice
 
     case $choice in
@@ -191,9 +183,6 @@ while true; do
             establish_connection $choice
             ;;
         5)
-            establish_connection $choice
-            ;;
-        6)
             echo "Ending script."
             exit 0
             ;;
