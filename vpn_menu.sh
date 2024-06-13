@@ -50,6 +50,10 @@ establish_connection() {
             # echo "Changing to Level 5 conditions..."
             change_network_conditions1 "180mbit" "10ms" 5
             sleep 5
+            # Display completion messages
+            echo "The testing is done."
+            echo "End the testing scenario."
+            echo "*********************************************"
             echo "Mobility test completed."
             return
             ;;
@@ -99,6 +103,10 @@ change_network_conditions() {
     determine_key_combinations "$bandwidth_int" "$latency_int"
     echo "The network condition is suitable for Security Level $level"
     echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
+    echo "VPN connection established successfully."
+    # Execute the ping command and display the results
+    echo "Checking connectivity..."
+    ping -c 2 10.1.0.2
 }
 
 change_network_conditions1() {
@@ -140,6 +148,10 @@ change_network_conditions1() {
     echo "The current network condition has changed, the security level should change, reselected the keys"
     echo "The network condition is suitable for Security Level $level"
     echo "Selected Keys: $key_type1_str (Traditional), $key_type2_str (PQC)"
+    echo "VPN connection established successfully."
+    # Execute the ping command and display the results
+    echo "Checking connectivity..."
+    ping -c 2 10.1.0.2
 }
 
 determine_key_combinations() {
@@ -216,6 +228,15 @@ apply_network_conditions_and_establish_connection() {
     swanctl --initiate --child host > /dev/null
 
     echo "VPN connection established successfully."
+
+    # Execute the ping command and display the results
+    echo "Checking connectivity..."
+    ping -c 2 10.1.0.2
+
+    # Display completion messages
+    echo "The testing is done."
+    echo "End the testing scenario."
+    echo "*********************************************"
 }
 
 while true; do
