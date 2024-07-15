@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Setup Process</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 20px; }
+        .section { margin-bottom: 20px; padding: 20px; border-radius: 10px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .highlight-section { background-color: #eaf7ff; }
+        .non-work-section { background-color: #f5f5f5; }
+        .manual-step { background-color: #ffe6e6; }
+        .title { font-size: 1.5em; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
+        .subtitle { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
+        .step { margin-bottom: 10px; font-size: 1.1em; color: #34495e; }
+        .client-server { display: flex; justify-content: space-between; align-items: flex-start; }
+        .client, .server, .ca { width: 30%; background-color: #ecf0f1; padding: 15px; border-radius: 10px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); }
+        .arrow { text-align: center; margin: 20px 0; font-size: 2em; color: #e74c3c; }
+        .highlight { background-color: #1abc9c; color: white; padding: 5px 10px; border-radius: 5px; display: inline-block; margin-bottom: 10px; }
+        .enhanced { background-color: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; display: inline-block; margin-bottom: 10px; }
+        .manual { background-color: #ffeb3b; color: black; padding: 5px 10px; border-radius: 5px; display: inline-block; margin-bottom: 10px; }
+        .note { font-size: 0.9em; color: #2c3e50; }
+        .encrypt-info { font-size: 0.9em; color: #2c3e50; text-align: center; margin-bottom: 10px; }
+        .key-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .key-table th, .key-table td { border: 1px solid #2c3e50; padding: 10px; text-align: left; }
+        .key-table th { background-color: #ecf0f1; }
+    </style>
+</head>
+<body>
+
+<div class="section">
+    <div class="title">VPN Setup Process</div>
+</div>
+
+<div class="section">
+    <div class="title">1. Certificate Generation</div>
+    <div class="client-server">
+        <div class="client">
+            <div class="step"><span class="highlight">Client:</span></div>
+            <div class="step">1. Generate a public and private key pair.</div>
+            <div class="step">2. Create CSR, which includes:</div>
+            <ul>
+                <li>Public Key: The client's public key.</li>
+                <li>Identifying Information: Information such as the client's name, organization, domain name, and possibly other attributes like email address.</li>
+            </ul>
+            <div class="step">3. Sign CSR with the client's private key to prove ownership.</div>
+            <div class="step">4. Submit CSR to CA.</div>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="ca">
+            <div class="step"><span class="highlight">CA:</span></div>
+            <div class="step">5. Verify the information in the CSR.</div>
+            <div class="step">6. Validate the client's identity.</div>
+            <div class="step">7. Create and sign a digital certificate for the client using the CA's private key.</div>
+            <div class="step">8. Distribute the signed certificate to the client.</div>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="server">
+            <div class="step"><span class="highlight">Server:</span></div>
+            <div class="step">9. Generate a public and private key pair.</div>
+            <div class="step">10. Create CSR, which includes:</div>
+            <ul>
+                <li>Public Key: The server's public key.</li>
+                <li>Identifying Information: Information such as the server's name, organization, domain name, and possibly other attributes like email address.</li>
+            </ul>
+            <div class="step">11. Sign CSR with the server's private key to prove ownership.</div>
+            <div class="step">12. Submit CSR to CA.</div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="client-server">
+        <div class="client">
+        </div>
+        <div class="arrow"></div>
+        <div class="ca">
+            <div class="step"><span class="highlight">CA:</span></div>
+            <div class="step">13. Verify the information in the sever'sCSR.</div>
+            <div class="step">14. Validate the server's identity.</div>
+            <div class="step">15. Create and sign a digital certificate for the server using the CA's private key.</div>
+            <div class="step">16. Distribute the signed certificate to the server.</div>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="server">
+            <div class="step"><span class="highlight">Server:</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="title">2. IKE_SA_INIT Exchange</div>
+    <div class="client-server">
+        <div class="client">
+            <div class="step"><span class="highlight">Client:</span></div>
+            <div class="step">17. Generate Diffie-Hellman key pair.</div>
+            <div class="step">18. Send IKE_SA_INIT request to the server, including Diffie-Hellman public value and other security parameters.</div>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="server">
+            <div class="step"><span class="highlight">Server:</span></div>
+            <div class="step">19. Generate Diffie-Hellman key pair.</div>
+            <div class="step">20. Send IKE_SA_INIT response to the client, including Diffie-Hellman public value and selected security parameters.</div>
+            <div class="step">21. Compute the shared Diffie-Hellman secret.</div>
+        </div>
+    </div>
+    <div class="encrypt-info">The shared Diffie-Hellman secret is used to derive cryptographic keys for encrypting and authenticating subsequent communications between the client and server.</div>
+</div>
+
+<div class="section highlight-section">
+    <div class="title">3. IKE_AUTH Exchange</div>
+    <div class="client-server">
+        <div class="client">
+            <div class="step"><span class="highlight">Client:</span></div>
+            <div class="step">22. Send IKE_AUTH request to the server, including:</div>
+            <ul>
+                <li>Client's certificate (including public key and CA's signature).</li>
+                <li>Authentication Data: Digital signature using client's private key.</li>
+            </ul>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="server">
+            <div class="step"><span class="highlight">Server:</span></div>
+            <div class="step">23. Verify the client's certificate using the CA's public key.</div>
+            <div class="step">24. Extract the client's public key from the certificate.</div>
+            <div class="step">25. Verify the client's digital signature using the client's public key.</div>
+            <div class="step">26. Send IKE_AUTH response to the client, including:</div>
+            <ul>
+                <li>Server's certificate (including public key and CA's signature).</li>
+                <li>Authentication Data: Digital signature using server's private key.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="title">4. CHILD_SA Setup</div>
+    <div class="client-server">
+        <div class="client">
+            <div class="step"><span class="highlight">Client:</span></div>
+            <div class="step">27. Negotiate CHILD_SA parameters with the server.</div>
+            <div class="step">28. Encrypt data using the session key derived from the shared Diffie-Hellman secret.</div>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="server">
+            <div class="step"><span class="highlight">Server:</span></div>
+            <div class="step">29. Negotiate CHILD_SA parameters with the client.</div>
+            <div class="step">30. Decrypt data using the session key derived from the shared Diffie-Hellman secret.</div>
+        </div>
+    </div>
+    <div class="encrypt-info">The shared Diffie-Hellman secret is crucial for deriving the session keys used in CHILD_SA setup for encrypting and decrypting the data traffic.</div>
+</div>
+
+<div class="section non-work-section">
+    <div class="title">5. VPN Tunnel Established</div>
+    <div class="client-server">
+        <div class="client">
+            <div class="step"><span class="highlight">Client:</span></div>
+            <div class="step">31. Encrypt data traffic using the session key.</div>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="encrypt-info">Session Key: Used for Encrypting and Decrypting Data Traffic</div>
+        <div class="server">
+            <div class="step"><span class="highlight">Server:</span></div>
+            <div class="step">32. Decrypt data traffic using the session key.</div>
+        </div>
+    </div>
+    <div class="step" style="text-align: center;">⇄</div>
+    <div class="step" style="text-align: center;"><span class="highlight">Secure Data Communication</span></div>
+</div>
+
+</body>
+</html>
