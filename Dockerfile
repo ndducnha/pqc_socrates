@@ -7,7 +7,7 @@ RUN \
   # install packages
   DEV_PACKAGES="wget unzip bzip2 make gcc libssl-dev cmake ninja-build" && \
   apt-get -y update && \
-  apt-get -y install iproute2 iputils-ping nano $DEV_PACKAGES && \
+  apt-get -y install iproute2 iputils-ping nano $DEV_PACKAGES python3 python3-pip && \
   \
   # download and build liboqs
   mkdir /liboqs && \
@@ -38,5 +38,14 @@ RUN \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
+# Download Python scripts
+RUN apt-get update && apt-get install -y wget && \
+    wget https://github.com/ndducnha/pqc_socrates/raw/main/server.py && \
+    wget https://github.com/ndducnha/pqc_socrates/raw/main/client.py && \
+    wget https://github.com/ndducnha/pqc_socrates/raw/main/vpn_menu.sh
+
 # Expose IKE and NAT-T ports
 EXPOSE 500 4500
+
+
+
