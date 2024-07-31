@@ -1,19 +1,3 @@
-
-
-docker exec -ti moon /bin/bash
-
-
-docker exec -ti carol /bin/bash
-
-
-
-cd /home/vboxuser/Documents/
-docker rm -f $(docker ps -aq)
-docker rmi -f $(docker images | grep -E 'vpnsocrates' | awk '{print $3}')
-docker build --no-cache -t vpnsocrates .
-cd docker/pq-strongswan
-docker-compose up
-
 docker exec -ti moon /bin/bash  
 apt update
 apt install binutils -y
@@ -24,10 +8,44 @@ apt update
 apt install binutils -y
 ./charon
 
-docker exec -ti carol /bin/bash
-swanctl --initiate --child net > /dev/null
+cd /home/vboxuser/Documents/
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images | grep -E 'vpnsocrates' | awk '{print $3}')
+docker build --no-cache -t vpnsocrates .
+cd docker/pq-strongswan
+docker-compose up
 
+docker cp test_scripts.sh 935de92ccab1:/
+
+chmod 777 test_scripts.sh
+./test_scripts.sh 2>&1 | tee Falcon1024_only.txt
+
+docker cp 935de92ccab1:/Falcon1024_only.txt ./results
+
+swanctl --initiate --child net > /dev/null
 swanctl --initiate --child host > /dev/null
+
+tc qdisc add dev eth0 root netem delay 10ms rate 50mbit
+
+tc qdisc del dev eth0 root
+
+swanctl --terminate --child host > /dev/null
+swanctl --terminate --child net > /dev/null
+
+# change network conditions:
+
+tc qdisc add dev eth0 root netem delay 150ms rate 20mbit
+
+tc qdisc del dev eth0 root
+
+tc qdisc add dev eth0 root netem delay 80ms rate 60mbit
+
+tc qdisc del dev eth0 root
+
+tc qdisc add dev eth0 root netem delay 20ms rate 100mbit
+
+tc qdisc del dev eth0 root
+
 
 Generate RSA certificate:
 
@@ -122,5 +140,96 @@ pki --issue --cacert caCertED25519.pem --cakey caKeyED25519.pem    \
      --dn "C=CH, O=Cyber, CN=carol@strongswan.org"  \
      --san carol@strongswan.org --outform pem > carolCertED25519.pem
      
+
+Generate FALCON512 certificate:
+
+pki --gen --type falcon512 --outform pem > caKeyFalcon512.pem
+
+pki --self --type priv --in caKeyFalcon512.pem --ca --lifetime 3652 \
+    --dn "C=CH, O=Cyber, CN=Cyber Root CA"                  \
+    --outform pem > caCertFalcon512.pem
+
+pki --gen --type falcon512 --outform pem > moonKeyFalcon512.pem
+
+pki --issue --cacert caCertFalcon512.pem --cakey caKeyFalcon512.pem   \
+    --type priv --in moonKeyFalcon512.pem --lifetime 1461 \
+    --dn "C=CH, O=Cyber, CN=moon.strongswan.org"    \
+    --san moon.strongswan.org --outform pem > moonCertFalcon512.pem
+
+pki --gen --type falcon512 --outform pem > carolKeyFalcon512.pem
+
+pki --issue --cacert caCertFalcon512.pem --cakey caKeyFalcon512.pem    \
+     --type priv --in carolKeyFalcon512.pem --lifetime 1461 \
+     --dn "C=CH, O=Cyber, CN=carol@strongswan.org"  \
+     --san carol@strongswan.org --outform pem > carolCertFalcon512.pem
+     
+Generate DILITHIUM2 certificate:
+
+pki --gen --type dilithium2 --outform pem > caKeyDilithium2.pem
+
+pki --self --type priv --in caKeyDilithium2.pem --ca --lifetime 3652 \
+    --dn "C=CH, O=Cyber, CN=Cyber Root CA"                  \
+    --outform pem > caCertDilithium2.pem
+
+pki --gen --type dilithium2 --outform pem > moonKeyDilithium2.pem
+
+pki --issue --cacert caCertDilithium2.pem --cakey caKeyDilithium2.pem   \
+    --type priv --in moonKeyDilithium2.pem --lifetime 1461 \
+    --dn "C=CH, O=Cyber, CN=moon.strongswan.org"    \
+    --san moon.strongswan.org --outform pem > moonCertDilithium2.pem
+
+pki --gen --type dilithium2 --outform pem > carolKeyDilithium2.pem
+
+pki --issue --cacert caCertDilithium2.pem --cakey caKeyDilithium2.pem    \
+     --type priv --in carolKeyDilithium2.pem --lifetime 1461 \
+     --dn "C=CH, O=Cyber, CN=carol@strongswan.org"  \
+     --san carol@strongswan.org --outform pem > carolCertDilithium2.pem
+     
+Generate DILITHIUM3 certificate:
+
+pki --gen --type dilithium3 --outform pem > caKeyDilithium3.pem
+
+pki --self --type priv --in caKeyDilithium3.pem --ca --lifetime 3652 \
+    --dn "C=CH, O=Cyber, CN=Cyber Root CA"                  \
+    --outform pem > caCertDilithium3.pem
+
+pki --gen --type dilithium3 --outform pem > moonKeyDilithium3.pem
+
+pki --issue --cacert caCertDilithium3.pem --cakey caKeyDilithium3.pem   \
+    --type priv --in moonKeyDilithium3.pem --lifetime 1461 \
+    --dn "C=CH, O=Cyber, CN=moon.strongswan.org"    \
+    --san moon.strongswan.org --outform pem > moonCertDilithium3.pem
+
+pki --gen --type dilithium3 --outform pem > carolKeyDilithium3.pem
+
+pki --issue --cacert caCertDilithium3.pem --cakey caKeyDilithium3.pem    \
+     --type priv --in carolKeyDilithium3.pem --lifetime 1461 \
+     --dn "C=CH, O=Cyber, CN=carol@strongswan.org"  \
+     --san carol@strongswan.org --outform pem > carolCertDilithium3.pem
+     
+     
+Generate SPHINCS256 certificate:
+
+pki --gen --type sphincs256 --outform pem > caKeySPHINCS.pem
+
+pki --self --type priv --in caKeySPHINCS.pem --ca --lifetime 3652 \
+    --dn "C=CH, O=Cyber, CN=Cyber Root CA"                  \
+    --outform pem > caCertSPHINCS.pem
+
+pki --gen --type sphincs256 --outform pem > moonKeySPHINCS.pem
+
+pki --issue --cacert caCertSPHINCS.pem --cakey caKeySPHINCS.pem   \
+    --type priv --in moonKeySPHINCS.pem --lifetime 1461 \
+    --dn "C=CH, O=Cyber, CN=moon.strongswan.org"    \
+    --san moon.strongswan.org --outform pem > moonCertSPHINCS.pem
+
+pki --gen --type sphincs256 --outform pem > carolKeySPHINCS.pem
+
+pki --issue --cacert caCertSPHINCS.pem --cakey caKeySPHINCS.pem    \
+     --type priv --in carolKeySPHINCS.pem --lifetime 1461 \
+     --dn "C=CH, O=Cyber, CN=carol@strongswan.org"  \
+     --san carol@strongswan.org --outform pem > carolCertSPHINCS.pem
+     
+docker swarm join --token SWMTKN-1-19na7hssc15ji9c43101lqcjcnyggjkhii9jm6hcv9q760pc14-8o0s1fvo6dfqb6puwc48ll173 192.168.0.3:2377
 
      
