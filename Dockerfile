@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y wget && \
     wget https://github.com/ndducnha/pqc_socrates/raw/main/vpn_menu.sh
 
 # Expose IKE and NAT-T ports
-EXPOSE 500 4500
+EXPOSE 500 4500 12345
 
 
 
