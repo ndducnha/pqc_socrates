@@ -237,4 +237,84 @@ pki --issue --cacert caCertSPHINCS.pem --cakey caKeySPHINCS.pem    \
      
 docker swarm join --token SWMTKN-1-19na7hssc15ji9c43101lqcjcnyggjkhii9jm6hcv9q760pc14-8o0s1fvo6dfqb6puwc48ll173 192.168.0.3:2377
 
-     
+ ## Docker-compose moon
+
+version: "3"
+
+services:
+  moon:
+    image: vpnsocrates:latest
+#    network_mode: "host"
+    ports:
+      - "500:500/tcp"
+      - "4500:4500/tcp"
+      - "12345:12345/tcp"
+      - "500:500/udp"
+      - "4500:4500/udp"
+      - "12345:12345/udp"
+    container_name: moon
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN                                         
+      - SYS_MODULE
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./moon:/etc/swanctl
+      - ./strongswan.conf:/etc/strongswan.conf
+    networks:
+      internet:
+         ipv4_address: 34.129.68.11
+      intranet:
+         ipv4_address: 10.98.0.4
+networks:
+  internet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 34.129.68.0/24
+  intranet:
+     ipam:
+        driver: default
+        config:
+          - subnet: 10.0.0.0/8
+
+## Docker-compose client
+
+version: "3"
+
+services:
+  carol:
+    image: vpnsocrates:latest
+    container_name: carol
+    ports:
+      - "500:500/tcp"
+      - "4500:4500/tcp"
+      - "12345:12345/tcp"
+      - "500:500/udp"
+      - "4500:4500/udp"
+      - "12345:12345/udp"
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_MODULE
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./carol:/etc/swanctl
+      - ./strongswan.conf:/etc/strongswan.conf
+    networks:
+      internet:
+         ipv4_address: 34.135.103.65
+
+networks:
+  internet:
+    ipam:
+      driver: default 
+      config:
+        - subnet: 34.135.103.0/24
+  intranet:
+     ipam:
+        driver: default
+        config:
+          - subnet: 10.0.0.0/8 
