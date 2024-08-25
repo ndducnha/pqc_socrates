@@ -15,6 +15,11 @@ docker build --no-cache -t vpnsocrates .
 cd docker/pq-strongswan
 docker-compose up
 
+docker rm $(docker ps -a -q)
+
+docker-compose up --build
+
+
 docker cp test_scripts.sh 935de92ccab1:/
 
 chmod 777 test_scripts.sh
