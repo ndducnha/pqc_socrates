@@ -15,6 +15,8 @@ docker build --no-cache -t vpnsocrates .
 cd docker/pq-strongswan
 docker-compose up
 
+docker network inspect pq-strongswan_internet
+
 docker rm $(docker ps -a -q)
 
 docker-compose up --build
