@@ -9,6 +9,7 @@ PORT = 12345
 OUTPUT_FILE = "network_status.txt"
 SERVER_IP = "192.168.0.2"
 FILE_SIZE_MB = 10  # Size of the temporary file to be generated
+SECURITY_LEVEL = 5
 
 def send_data(server_ip, file_path):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,8 +58,10 @@ if __name__ == "__main__":
             bandwidth = send_data(SERVER_IP, temp_file.name)
             print(f"Bandwidth: {bandwidth:.3f} Mbps")
 
+            security_level = SECURITY_LEVEL
+
             with open(OUTPUT_FILE, "w") as f:
-                f.write(f"{bandwidth:.3f}\n{latency:.3f}\n")
+                f.write(f"SECURITY_LEVEL\n{bandwidth:.3f}\n{latency:.3f}\n")
 
             time.sleep(2)
     finally:

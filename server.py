@@ -5,6 +5,7 @@ import subprocess
 BUFFER_SIZE = 1024
 PORT = 12345
 OUTPUT_FILE = "network_status.txt"
+SECURITY_LEVEL = 5
 
 def measure_bandwidth_server(client_socket):
     total_bytes = 0
@@ -34,6 +35,7 @@ def start_bandwidth_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(('', PORT))
     server_socket.listen(1)
+    security_level = SECURITY_LEVEL
 
     while True:
         client_socket, addr = server_socket.accept()
@@ -48,7 +50,7 @@ def start_bandwidth_server():
         print(f"Parsed latency: {latency:.3f} ms")
 
         with open(OUTPUT_FILE, "w") as f:
-            f.write(f"{bandwidth:.3f}\n{latency:.3f}\n")
+            f.write(f"SECURITY_LEVEL\n{bandwidth:.3f}\n{latency:.3f}\n")
 
     server_socket.close()
 
