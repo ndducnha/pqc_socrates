@@ -50,7 +50,7 @@ def start_bandwidth_server():
         print(f"Parsed latency: {latency:.3f} ms")
 
         with open(OUTPUT_FILE, "w") as f:
-            f.write(f"SECURITY_LEVEL\n{bandwidth:.3f}\n{latency:.3f}\n")
+            f.write(f"{security_level}\n{bandwidth:.3f}\n{latency:.3f}\n")
 
     server_socket.close()
 
