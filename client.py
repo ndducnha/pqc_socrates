@@ -61,7 +61,7 @@ if __name__ == "__main__":
             security_level = SECURITY_LEVEL
 
             with open(OUTPUT_FILE, "w") as f:
-                f.write(f"SECURITY_LEVEL\n{bandwidth:.3f}\n{latency:.3f}\n")
+                f.write(f"{security_level}\n{bandwidth:.3f}\n{latency:.3f}\n")
 
             time.sleep(2)
     finally:
